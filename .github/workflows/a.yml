@@ -1,0 +1,15 @@
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '45 7 * * *'
+
+
+jobs:
+
+  cron:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: li1ht2ay-3es/ge1es2s-p3us-4x@cron
+        with:
+          token: ${{ secrets.token }}
