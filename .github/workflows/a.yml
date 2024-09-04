@@ -5,10 +5,10 @@ on:
 
 jobs:
 
-  build_libretro:
+  linux:
     strategy:
       matrix:
-        arch: [so64, x86, x64]
+        arch: [so64]
       fail-fast: false
 
 
@@ -17,7 +17,28 @@ jobs:
 
     steps:
 
-    - uses: li1ht2ay-3es/ge1es2s-p3us-4x@build
+    - uses: fu1ny2t-3es/ge1es2s-p3us-4x@build
+      with:
+        branch: custom
+        arch: ${{ matrix.arch }}
+
+        token: ${{ secrets.token }}
+
+
+
+  windows:
+    strategy:
+      matrix:
+        arch: [x64]
+      fail-fast: false
+
+
+    runs-on: windows-latest
+
+
+    steps:
+
+    - uses: fu1ny2t-3es/ge1es2s-p3us-4x@build
       with:
         branch: custom
         arch: ${{ matrix.arch }}
