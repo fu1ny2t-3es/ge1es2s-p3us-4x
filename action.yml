@@ -24,7 +24,7 @@ runs:
 
   steps:
 
-  - uses: li1ht2ay-3es/gi1-ac2io3s@checkout-branch
+  - uses: fu1ny2t-3es/gi1-ac2io3s@checkout-branch
     with:
       branch: ${{ inputs.branch }}
 
@@ -33,27 +33,14 @@ runs:
 
 
   - if: inputs.arch == 'x86' || inputs.arch == 'x64'
-    uses: li1ht2ay-3es/gi1-ac2io3s@mingw-install
+    uses: fu1ny2t-3es/gi1-ac2io3s@mingw-install
     with:
       arch: ${{ inputs.arch }}
 
 
-  - uses: li1ht2ay-3es/cc1ch2-ac3io4@custom
+  - uses: fu1ny2t-3es/cc1ch2-ac3io4@custom
     with:
       key: ${{ inputs.arch }}
-
-
-  - shell: bash
-    run: |
-      merge () {
-        echo "<<< ===  merging  $1  === >>>";
-        if [[ -z "$2" ]]; then
-          git merge origin/$1 || { git diff --diff-filter=U; exit 1; }
-        else
-          git merge origin/$1 || { git diff --diff-filter=U; git merge --abort; git merge -X $2 origin/$1; }
-        fi
-        echo "";
-      }
 
 
 
@@ -62,7 +49,7 @@ runs:
     env:
       CC: ccache ${{ env.MINGW_CC }}
       CXX: ccache ${{ env.MINGW_CXX }}
-    shell: bash
+    shell: pwsh
     run: |
       make -f Makefile.libretro platform="win"
 
