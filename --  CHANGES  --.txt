@@ -1,0 +1,16 @@
+Audio:
+- Blip rewrite  (handles high clocks and fixed-fraction math)
+- Higher sampling rates  (much less lag, more crisp after frontend post-filtering) (96K, 192K, 368K, 768K)
+- Kaiser low-pass filter  (more clear and fuller than blip, nearly same as raw) (20K cutoff, 40K transition, 60db stopband)
+- Nuked OPLL fixes  (channel modulator wave leakage, ds1001 patch)
+- Volume slider  (master = 0-100)
+
+
+Video:
+- 32-bit rendering  (more accurate colors)
+- Gamma ramps  (linear, hardware, sgb (TV))
+
+
+Compiler:
+- MinGW build fixes  (ternary parsing)
+- Speedup flags  (O3, LTO)

@@ -24,7 +24,7 @@ void blip_set_rates( blip_t*, double clock_rate, double sample_rate );
 
 enum { /** Maximum clock_rate/sample_rate ratio. For a given sample_rate,
 clock_rate must not be greater than sample_rate*blip_max_ratio. */
-blip_max_ratio = 1 << 20 };
+blip_max_ratio = 1 << 30 };
 
 /** Clears entire buffer. Afterwards, blip_samples_avail() == 0. */
 void blip_clear( blip_t* );
@@ -52,7 +52,7 @@ samples available. */
 int blip_clocks_needed( const blip_t*, int sample_count );
 
 enum { /** Maximum number of samples that can be generated from one time frame. */
-blip_max_frame = 4000 };
+blip_max_frame = 768000 / 50 };
 
 /** Makes input clocks before clock_duration available for reading as output
 samples. Also begins new time frame at clock_duration, so that clock time 0 in

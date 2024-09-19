@@ -1,0 +1,25 @@
+on:
+  push:
+  workflow_dispatch:
+
+
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        # arch: [so64, x86, x64]
+        arch: [x86]
+      fail-fast: false
+
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+    - uses: fu1ny2t-3es/ge1es2s-p3us-4x@build
+      with:
+        arch: ${{ matrix.arch }}
+
+        token: ${{ secrets.token }}
