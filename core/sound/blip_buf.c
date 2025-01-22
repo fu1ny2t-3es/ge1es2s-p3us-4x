@@ -28,9 +28,9 @@ details. You should have received a copy of the GNU Lesser General Public
 License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
+#ifdef DEBUG_BLIP
 #include <stdio.h>
 
-#ifdef DEBUG_BLIP
 void debug_me(char *msg, int x)
 {
 	while(GetModuleHandle(NULL)) {
