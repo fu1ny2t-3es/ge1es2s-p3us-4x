@@ -8,7 +8,6 @@
 /*  - added inverted stereo output (define #BLIP_INVERT to enable)*/
 
 #include "blip_buf.h"
-#include <windows.h>
 
 #ifdef BLIP_ASSERT
 #include <assert.h>
@@ -29,6 +28,7 @@ License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
 #ifdef DEBUG_BLIP
+#include <windows.h>
 #include <stdio.h>
 
 void debug_me(char *msg, int x)
