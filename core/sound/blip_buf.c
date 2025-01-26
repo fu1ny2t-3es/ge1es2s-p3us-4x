@@ -313,12 +313,12 @@ int blip_read_samples( blip_t* m, short out [], int count)
 
 #ifdef BLIP_ASSERT
 	assert( count >= 0 );
+#endif
 
 	if ( count > (m->offset >> time_bits) )
 		count = m->offset >> time_bits;
 
 	if ( count )
-#endif
 	{
 #ifdef BLIP_MONO
 		buf_t const* in = SAMPLES( m );
@@ -373,6 +373,7 @@ int blip_mix_samples( blip_t* m1, blip_t* m2, blip_t* m3, short out [], int coun
 {
 #ifdef BLIP_ASSERT
 	assert( count >= 0 );
+#endif
 
 	if ( count > (m1->offset >> time_bits) )
 		count = m1->offset >> time_bits;
@@ -382,7 +383,6 @@ int blip_mix_samples( blip_t* m1, blip_t* m2, blip_t* m3, short out [], int coun
 		count = m3->offset >> time_bits;
 
 	if ( count )
-#endif
 	{
 		buf_t const* end;
 		buf_t const* in[3];
