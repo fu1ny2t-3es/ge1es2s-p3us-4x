@@ -901,7 +901,7 @@ LPF_TAPS(-0.000014558820251266),
 
 
 /* Kaiser( 96K sampling, 45K cutoff, 4K transition, 60 stopband ) = 4K attenuation, 44 sample delay */
-enum { lpf_step_96_48_taps = 89 };
+enum { lpf_step_96_taps = 89 };
 
 static buf_t const lpf_step_96[lpf_step_96_taps] = {
 LPF_TAPS(-0.000104325762653436),
