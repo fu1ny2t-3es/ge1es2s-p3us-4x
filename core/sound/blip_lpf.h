@@ -719,9 +719,9 @@ LPF_TAPS(-0.000007279408218847),
 
 
 /* Kaiser( 192K sampling, 93K cutoff, 4K transition, 60 stopband ) = 91K attenuation, 87 sample delay */
-enum { lpf_step_192_96_taps = 175 };
+enum { lpf_step_192_taps = 175 };
 
-static buf_t const lpf_step_192_96[lpf_step_192_taps] = {
+static buf_t const lpf_step_192[lpf_step_192_taps] = {
 LPF_TAPS(0.000057672880527939),
 LPF_TAPS(-0.000074748923040525),
 LPF_TAPS(0.000094111139522998),
@@ -903,7 +903,7 @@ LPF_TAPS(0.000057672880527939),
 /* Kaiser( 192K sampling, 45K cutoff, 4K transition, 60 stopband ) = 43K attenuation, 87 sample delay */
 enum { lpf_step_192_96_taps = 175 };
 
-static buf_t const lpf_step_192_96[lpf_step_192_taps] = {
+static buf_t const lpf_step_192_96[lpf_step_192_96_taps] = {
 LPF_TAPS(0.000047328527018563),
 LPF_TAPS(0.000074745159865918),
 LPF_TAPS(-0.000050300919605093),
@@ -1085,7 +1085,7 @@ LPF_TAPS(0.000047328527018563),
 /* Kaiser( 192K sampling, 21K cutoff, 4K transition, 60 stopband ) = 19K attenuation, 87 sample delay */
 enum { lpf_step_192_48_taps = 175 };
 
-static buf_t const lpf_step_192_48[lpf_step_192_taps] = {
+static buf_t const lpf_step_192_48[lpf_step_192_48_taps] = {
 LPF_TAPS(-0.000007311795952492),
 LPF_TAPS(0.000049938246170547),
 LPF_TAPS(0.000102101433070470),
@@ -1363,7 +1363,7 @@ LPF_TAPS(-0.000104325762653436),
 /* Kaiser( 96K sampling, 21K cutoff, 4K transition, 60 stopband ) = 19K attenuation, 44 sample delay */
 enum { lpf_step_96_48_taps = 89 };
 
-static buf_t const lpf_step_96_48[lpf_step_96_taps] = {
+static buf_t const lpf_step_96_48[lpf_step_96_48_taps] = {
 LPF_TAPS(-0.000104311123145169),
 LPF_TAPS(0.000116783151864127),
 LPF_TAPS(0.000263585308025871),
