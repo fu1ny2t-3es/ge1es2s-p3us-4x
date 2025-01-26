@@ -270,8 +270,8 @@ static void remove_samples( blip_t* m, int count )
 	switch( blip_sample_rate ) {
 	case 768000: lpf_taps = lpf_step_768_taps; break;
 	case 384000: lpf_taps = lpf_step_384_taps; break;
-	case 192000: lpf_taps = lpf_step_192_taps; break;
-	case 96000: lpf_taps = lpf_step_96_taps; break;
+	case 192000: lpf_taps = lpf_step_192_48_taps; break;
+	case 96000: lpf_taps = lpf_step_96_48_taps; break;
 	case 48000: lpf_taps = lpf_step_48_taps; break;
 	default: lpf_taps = 0; break;
 	}
@@ -499,15 +499,15 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 
 	case 192000:
 		for( int lcv = 0; lcv < lpf_step_192_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_192[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_192[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_192_48[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_192_48[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
 	case 96000:
 		for( int lcv = 0; lcv < lpf_step_96_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_96[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_96[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_96_48[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_96_48[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
