@@ -315,8 +315,8 @@ int blip_read_samples( blip_t* m, short out [], int count)
 	assert( count >= 0 );
 #endif
 
-	if ( count > (m->offset >> time_bits) )
-		count = m->offset >> time_bits;
+	if ( count > blip_samples_avail(m) )
+		count = blip_samples_avail(m);
 
 	if ( count )
 	{
@@ -375,12 +375,12 @@ int blip_mix_samples( blip_t* m1, blip_t* m2, blip_t* m3, short out [], int coun
 	assert( count >= 0 );
 #endif
 
-	if ( count > (m1->offset >> time_bits) )
-		count = m1->offset >> time_bits;
-	if ( count > (m2->offset >> time_bits) )
-		count = m2->offset >> time_bits;
-	if ( count > (m3->offset >> time_bits) )
-		count = m3->offset >> time_bits;
+	if ( count > blip_samples_avail(m1) )
+		count = blip_samples_avail(m1);
+	if ( count > blip_samples_avail(m2) )
+		count = blip_samples_avail(m2);
+	if ( count > blip_samples_avail(m3) )
+		count = blip_samples_avail(m3);
 
 	if ( count )
 	{
