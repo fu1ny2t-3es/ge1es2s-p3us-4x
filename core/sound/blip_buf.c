@@ -498,14 +498,14 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 		break;
 
 	case 192000:
-		for( int lcv = 0; lcv < lpf_step_192_taps_48; lcv++ ) {
+		for( int lcv = 0; lcv < lpf_step_192_48_taps; lcv++ ) {
 			out_l [lcv] += ((signed long long)lpf_step_192_48[lcv] * delta_l) / lpf_scale;
 			out_r [lcv] += ((signed long long)lpf_step_192_48[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
 	case 96000:
-		for( int lcv = 0; lcv < lpf_step_96_taps_48; lcv++ ) {
+		for( int lcv = 0; lcv < lpf_step_96_48_taps; lcv++ ) {
 			out_l [lcv] += ((signed long long)lpf_step_96_48[lcv] * delta_l) / lpf_scale;
 			out_r [lcv] += ((signed long long)lpf_step_96_48[lcv] * delta_r) / lpf_scale;
 		}
