@@ -485,36 +485,36 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 #if 1
 	case 768000:
 		for( int lcv = 0; lcv < lpf_step_768K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_768K_48K_taps[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_768K_48K_taps[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_768K_48K[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_768K_48K[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
 	case 384000:
 		for( int lcv = 0; lcv < lpf_step_384K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_384K_48K_taps[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_384K_48K_taps[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_384K_48K[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_384K_48K[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
 	case 192000:
 		for( int lcv = 0; lcv < lpf_step_192K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_192K_48K_taps[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_192K_48K_taps[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_192K_48K[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_192K_48K[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
 	case 96000:
 		for( int lcv = 0; lcv < lpf_step_96K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_96K_48K_taps[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_96K_48K_taps[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_96K_48K[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_96K_48K[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 
 	case 48000:
 		for( int lcv = 0; lcv < lpf_step_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_48K_taps[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_48K_taps[lcv] * delta_r) / lpf_scale;
+			out_l [lcv] += ((signed long long)lpf_step_48K[lcv] * delta_l) / lpf_scale;
+			out_r [lcv] += ((signed long long)lpf_step_48K[lcv] * delta_r) / lpf_scale;
 		}
 		break;
 #endif
