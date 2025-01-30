@@ -2503,7 +2503,7 @@ LPF_TAPS(-0.000007279408218847),
 /* Blackman( 192K sampling, 22K cutoff, 3K transition ) */
 enum { lpf_step_192K_48K_taps = 295 };
 
-static buf_t const lpf_step_192K_48K[lpf_step_192_48K_taps] = {
+static buf_t const lpf_step_192K_48K[lpf_step_192K_48K_taps] = {
 LPF_TAPS(0.000000000000000000),
 LPF_TAPS(-0.000000088867880174),
 LPF_TAPS(-0.000000238149160989),
