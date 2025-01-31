@@ -267,7 +267,7 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 		if(1) {
 			switch( sample_rate ) {
 			case 768000:
-				for( int lcv = 0; lcv < kaiser_768_taps; lcv++ ) {
+				for( int lcv = 0; lcv < kaiser_768K_taps; lcv++ ) {
 					out_l [lcv] += ((signed long long)kaiser_768K_48K[lcv] * delta_l) / lpf_scale;
 					out_r [lcv] += ((signed long long)kaiser_768K_48K[lcv] * delta_r) / lpf_scale;
 				}
