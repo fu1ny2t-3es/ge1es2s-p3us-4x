@@ -144,7 +144,7 @@ static uint8_t brm_format[0x40] =
 };
 uint8_t cart_size;
 
-#define MAX_SOUND 1536000
+#define MAX_SOUND 768000
 
 #ifdef FRONTEND_SUPPORTS_RGB888
 	#define RETRO_PITCH uint32_t
