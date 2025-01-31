@@ -266,15 +266,7 @@ static void remove_samples( blip_t* m, int count )
 	buf_t* buf = m->buffer[0];
 #endif
 
-	int lpf_taps;
-	switch( blip_sample_rate ) {
-	case 768000: lpf_taps = lpf_step_768K_48K_taps; break;
-	case 384000: lpf_taps = lpf_step_384K_48K_taps; break;
-	case 192000: lpf_taps = lpf_step_192K_48K_taps; break;
-	case 96000: lpf_taps = lpf_step_96K_48K_taps; break;
-	case 48000: lpf_taps = lpf_step_48K_taps; break;
-	default: lpf_taps = 0; break;
-	}
+	int lpf_taps = blip_lpf_taps();
 
 	int remain = (m->offset >> time_bits) - count;
 	if( lpf_taps > remain ) remain = lpf_taps;
@@ -480,50 +472,7 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 	assert( pos <= m->size );
 #endif
 
-	/* 31-bit * 15-bit = 46-bit >> 15 = 31-bit */
-	switch( blip_sample_rate ) {
-#if 1
-	case 768000:
-		for( int lcv = 0; lcv < lpf_step_768K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_768K_48K[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_768K_48K[lcv] * delta_r) / lpf_scale;
-		}
-		break;
-
-	case 384000:
-		for( int lcv = 0; lcv < lpf_step_384K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_384K_48K[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_384K_48K[lcv] * delta_r) / lpf_scale;
-		}
-		break;
-
-	case 192000:
-		for( int lcv = 0; lcv < lpf_step_192K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_192K_48K[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_192K_48K[lcv] * delta_r) / lpf_scale;
-		}
-		break;
-
-	case 96000:
-		for( int lcv = 0; lcv < lpf_step_96K_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_96K_48K[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_96K_48K[lcv] * delta_r) / lpf_scale;
-		}
-		break;
-
-	case 48000:
-		for( int lcv = 0; lcv < lpf_step_48K_taps; lcv++ ) {
-			out_l [lcv] += ((signed long long)lpf_step_48K[lcv] * delta_l) / lpf_scale;
-			out_r [lcv] += ((signed long long)lpf_step_48K[lcv] * delta_r) / lpf_scale;
-		}
-		break;
-#endif
-
-	default:
-		out_l [0] += (buf_t) delta_l * (1UL << lpf_frac);
-		out_r [0] += (buf_t) delta_r * (1UL << lpf_frac);
-		break;
-	}
+	blip_lpf_run(sample_rate, out_l, out_r, delta_l, delta_r);
 }
 
 
