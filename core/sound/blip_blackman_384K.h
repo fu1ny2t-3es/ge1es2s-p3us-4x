@@ -1191,7 +1191,7 @@ LPF_TAPS(0.000000000000000000),
 
 
 /* 46K cutoff + 1.5K window */
-static buf_t const blackman_384K_96K[blackman_384Ktaps] = {
+static buf_t const blackman_384K_96K[blackman_384K_taps] = {
 LPF_TAPS(0.000000000000000000),
 LPF_TAPS(0.000000006503202820),
 LPF_TAPS(-0.000000005849842015),
