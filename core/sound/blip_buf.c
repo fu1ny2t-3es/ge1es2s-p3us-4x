@@ -472,7 +472,7 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 	assert( pos <= m->size );
 #endif
 
-	blip_lpf_run(blip_sample_rate, out_l, out_r, delta_l, delta_r);
+	blip_lpf_stereo(blip_sample_rate, out_l, out_r, delta_l, delta_r);
 }
 
 
