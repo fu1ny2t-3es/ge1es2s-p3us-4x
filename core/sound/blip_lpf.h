@@ -15,7 +15,7 @@ enum { lpf_scale = 32768 };
 #define LPF_TAPS(x) (buf_t) ((double) (x) * (double) (1UL << lpf_frac) * (double) lpf_scale)
 
 
-/* highest quality, brickwall, excellent */
+/* excellent quality, brickwall, crisp */
 #include "blip_kaiser_768K.h"
 #include "blip_kaiser_384K.h"
 #include "blip_kaiser_192K.h"
@@ -31,7 +31,7 @@ enum { lpf_scale = 32768 };
 #include "blip_blackman_48K.h"
 
 
-/* high quality, very good, 40db stopband */
+/* good quality, part blurry, 40db stopband, 20% faster */
 #include "blip_kaiser_fast_768K.h"
 #include "blip_kaiser_fast_384K.h"
 #include "blip_kaiser_fast_192K.h"
@@ -41,7 +41,7 @@ enum { lpf_scale = 32768 };
 
 static int blip_lpf_taps(int sample_rate)
 {
-	if(1) {
+	if(0) {
 		switch( sample_rate ) {
 		case 768000: return kaiser_fast_768K_taps;
 		case 384000: return kaiser_fast_384K_taps;
@@ -61,7 +61,7 @@ static int blip_lpf_taps(int sample_rate)
 		}
 	}
 
-	if(0) {
+	if(1) {
 		switch( sample_rate ) {
 		case 768000: return kaiser_768K_taps;
 		case 384000: return kaiser_384K_taps;
@@ -79,7 +79,7 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 {
 	/* 31-bit * 15-bit = 46-bit >> 15 = 31-bit */
 
-	if(1) {
+	if(0) {
 		if(1) {
 			switch( sample_rate ) {
 			case 768000:
@@ -483,7 +483,7 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 	}
 
 
-	if(0) {
+	if(1) {
 		if(1) {
 			switch( sample_rate ) {
 			case 768000:
