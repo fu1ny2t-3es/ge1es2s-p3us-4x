@@ -15,15 +15,7 @@ enum { lpf_scale = 32768 };
 #define LPF_TAPS(x) (buf_t) ((double) (x) * (double) (1UL << lpf_frac) * (double) lpf_scale)
 
 
-/* high quality, brickwall stopband, low post-noise ringing, no pre-rippling */
-#include "blip_blackman_768K.h"
-#include "blip_blackman_384K.h"
-#include "blip_blackman_192K.h"
-#include "blip_blackman_96K.h"
-#include "blip_blackman_48K.h"
-
-
-/* lower quality, leaky stopband, post-noise ringing, small pre-rippling */
+/* highest quality, brickwall, excellent */
 #include "blip_kaiser_768K.h"
 #include "blip_kaiser_384K.h"
 #include "blip_kaiser_192K.h"
@@ -31,8 +23,34 @@ enum { lpf_scale = 32768 };
 #include "blip_kaiser_48K.h"
 
 
+/* higher quality, brickwall, pretty good but kinda flat */
+#include "blip_blackman_768K.h"
+#include "blip_blackman_384K.h"
+#include "blip_blackman_192K.h"
+#include "blip_blackman_96K.h"
+#include "blip_blackman_48K.h"
+
+
+/* high quality, very good, 40db stopband */
+#include "blip_kaiser_fast_768K.h"
+#include "blip_kaiser_fast_384K.h"
+#include "blip_kaiser_fast_192K.h"
+#include "blip_kaiser_fast_96K.h"
+#include "blip_kaiser_fast_48K.h"
+
+
 static int blip_lpf_taps(int sample_rate)
 {
+	if(1) {
+		switch( sample_rate ) {
+		case 768000: return kaiser_fast_768K_taps;
+		case 384000: return kaiser_fast_384K_taps;
+		case 192000: return kaiser_fast_192K_taps;
+		case 96000: return kaiser_fast_96K_taps;
+		case 48000: return kaiser_fast_48K_taps;
+		}
+	}
+
 	if(0) {
 		switch( sample_rate ) {
 		case 768000: return blackman_768K_taps;
@@ -43,7 +61,7 @@ static int blip_lpf_taps(int sample_rate)
 		}
 	}
 
-	if(1) {
+	if(0) {
 		switch( sample_rate ) {
 		case 768000: return kaiser_768K_taps;
 		case 384000: return kaiser_384K_taps;
@@ -60,6 +78,208 @@ static int blip_lpf_taps(int sample_rate)
 static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_l, int delta_r)
 {
 	/* 31-bit * 15-bit = 46-bit >> 15 = 31-bit */
+
+	if(1) {
+		if(1) {
+			switch( sample_rate ) {
+			case 768000:
+				for( int lcv = 0; lcv < kaiser_fast_768K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_768K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_768K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 384000:
+				for( int lcv = 0; lcv < kaiser_fast_384K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_384K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_384K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 192000:
+				for( int lcv = 0; lcv < kaiser_fast_192K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_192K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_192K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 96000:
+				for( int lcv = 0; lcv < kaiser_fast_96K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_96K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_96K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 48000:
+				for( int lcv = 0; lcv < kaiser_fast_48K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+			}
+		}
+
+
+		if(0) {
+			switch( sample_rate ) {
+			case 768000:
+				for( int lcv = 0; lcv < kaiser_fast_768K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_768K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_768K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 384000:
+				for( int lcv = 0; lcv < kaiser_fast_384K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_384K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_384K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 192000:
+				for( int lcv = 0; lcv < kaiser_fast_192K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_192K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_192K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 96000:
+				for( int lcv = 0; lcv < kaiser_fast_96K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 48000:
+				for( int lcv = 0; lcv < kaiser_fast_48K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+			}
+		}
+
+
+		if(0) {
+			switch( sample_rate ) {
+			case 768000:
+				for( int lcv = 0; lcv < kaiser_fast_768K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_768K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_768K_96K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 384000:
+				for( int lcv = 0; lcv < kaiser_fast_384K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_384K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_384K_96K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 192000:
+				for( int lcv = 0; lcv < kaiser_fast_192K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_192K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_192K_96K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 96000:
+				for( int lcv = 0; lcv < kaiser_fast_96K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 48000:
+				for( int lcv = 0; lcv < kaiser_fast_48K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+			}
+		}
+
+
+		if(0) {
+			switch( sample_rate ) {
+			case 768000:
+				for( int lcv = 0; lcv < kaiser_fast_768K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_768K_192K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_768K_192K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 384000:
+				for( int lcv = 0; lcv < kaiser_fast_384K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_384K_192K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_384K_192K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 192000:
+				for( int lcv = 0; lcv < kaiser_fast_192K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_192K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_192K_96K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 96000:
+				for( int lcv = 0; lcv < kaiser_fast_96K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 48000:
+				for( int lcv = 0; lcv < kaiser_fast_48K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+			}
+		}
+
+
+		if(0) {
+			switch( sample_rate ) {
+			case 768000:
+				for( int lcv = 0; lcv < kaiser_fast_768K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_768K_384K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_768K_384K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 384000:
+				for( int lcv = 0; lcv < kaiser_fast_384K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_384K_192K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_384K_192K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 192000:
+				for( int lcv = 0; lcv < kaiser_fast_192K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_192K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_192K_96K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 96000:
+				for( int lcv = 0; lcv < kaiser_fast_96K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_96K_48K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 48000:
+				for( int lcv = 0; lcv < kaiser_fast_48K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_fast_48K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+			}
+		}
+	}
+
 
 	if(0) {
 		if(0) {
@@ -263,8 +483,48 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 	}
 
 
-	if(1) {
+	if(0) {
 		if(1) {
+			switch( sample_rate ) {
+			case 768000:
+				for( int lcv = 0; lcv < kaiser_768K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_768K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_768K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 384000:
+				for( int lcv = 0; lcv < kaiser_384K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_384K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_384K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 192000:
+				for( int lcv = 0; lcv < kaiser_192K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_192K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_192K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 96000:
+				for( int lcv = 0; lcv < kaiser_96K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_96K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_96K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+
+			case 48000:
+				for( int lcv = 0; lcv < kaiser_48K_taps; lcv++ ) {
+					out_l [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_r) / lpf_scale;
+				}
+				return;
+			}
+		}
+
+
+		if(0) {
 			switch( sample_rate ) {
 			case 768000:
 				for( int lcv = 0; lcv < kaiser_768K_taps; lcv++ ) {
@@ -296,8 +556,8 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 
 			case 48000:
 				for( int lcv = 0; lcv < kaiser_48K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_48K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_48K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 			}
@@ -329,15 +589,15 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 
 			case 96000:
 				for( int lcv = 0; lcv < kaiser_96K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_96K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_96K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_96K_48K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 
 			case 48000:
 				for( int lcv = 0; lcv < kaiser_48K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_48K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_48K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 			}
@@ -362,22 +622,22 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 
 			case 192000:
 				for( int lcv = 0; lcv < kaiser_192K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_192K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_192K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_192K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_192K_96K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 
 			case 96000:
 				for( int lcv = 0; lcv < kaiser_96K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_96K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_96K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_96K_48K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 
 			case 48000:
 				for( int lcv = 0; lcv < kaiser_48K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_48K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_48K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 			}
@@ -395,69 +655,29 @@ static void blip_lpf_run(int sample_rate, buf_t* out_l, buf_t* out_r, int delta_
 
 			case 384000:
 				for( int lcv = 0; lcv < kaiser_384K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_384K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_384K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_384K_192K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_384K_192K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 
 			case 192000:
 				for( int lcv = 0; lcv < kaiser_192K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_192K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_192K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_192K_96K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_192K_96K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 
 			case 96000:
 				for( int lcv = 0; lcv < kaiser_96K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_96K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_96K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_96K_48K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_96K_48K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 
 			case 48000:
 				for( int lcv = 0; lcv < kaiser_48K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_48K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_48K[lcv] * delta_r) / lpf_scale;
-				}
-				return;
-			}
-		}
-
-
-		if(0) {
-			switch( sample_rate ) {
-			case 768000:
-				for( int lcv = 0; lcv < kaiser_768K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_768K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_768K[lcv] * delta_r) / lpf_scale;
-				}
-				return;
-
-			case 384000:
-				for( int lcv = 0; lcv < kaiser_384K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_384K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_384K[lcv] * delta_r) / lpf_scale;
-				}
-				return;
-
-			case 192000:
-				for( int lcv = 0; lcv < kaiser_192K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_192K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_192K[lcv] * delta_r) / lpf_scale;
-				}
-				return;
-
-			case 96000:
-				for( int lcv = 0; lcv < kaiser_96K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_96K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_96K[lcv] * delta_r) / lpf_scale;
-				}
-				return;
-
-			case 48000:
-				for( int lcv = 0; lcv < kaiser_48K_taps; lcv++ ) {
-					out_l [lcv] += ((signed long long)kaiser_48K[lcv] * delta_l) / lpf_scale;
-					out_r [lcv] += ((signed long long)kaiser_48K[lcv] * delta_r) / lpf_scale;
+					out_l [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_l) / lpf_scale;
+					out_r [lcv] += ((signed long long)kaiser_48K_24K[lcv] * delta_r) / lpf_scale;
 				}
 				return;
 			}
