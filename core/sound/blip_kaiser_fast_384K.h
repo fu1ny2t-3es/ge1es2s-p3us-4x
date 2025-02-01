@@ -587,7 +587,7 @@ LPF_TAPS(0.000010782884878433),
 
 
 /* 46K cutoff + 1.5K window */
-static buf_t const kaiser_384K_48K[kaiser_fast_384K_taps] = {
+static buf_t const kaiser_fast_384K_48K[kaiser_fast_384K_taps] = {
 LPF_TAPS(0.000240543389674705),
 LPF_TAPS(0.000022587429923525),
 LPF_TAPS(-0.000229358686525538),
