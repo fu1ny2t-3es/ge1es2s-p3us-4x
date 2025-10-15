@@ -1,0 +1,14 @@
+Audio:
+- Remove blip highpass  [higher range]
+- Higher sampling rate  [lower latency]
+- Volume sliders
+
+
+Video:
+- 32-bit rendering  [accurate colors]
+- Gamma ramps  [darker colors]
+
+
+Compiler:
+- Ternary brackets  [MinGW fixing]
+- Faster compiler  [O3]
