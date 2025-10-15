@@ -2,6 +2,10 @@
 /*                            MAIN 68K CORE                                 */
 /* ======================================================================== */
 
+#if defined(_WIN32)
+#define TRACE_M68K
+#endif
+
 extern int vdp_68k_irq_ack(int int_level);
 
 #define m68ki_cpu m68k
@@ -18,6 +22,10 @@ extern int vdp_68k_irq_ack(int int_level);
 #include "m68kconf.h"
 #include "m68kcpu.h"
 #include "m68kops.h"
+
+#ifdef TRACE_M68K
+#include "m68kd.h"
+#endif
 
 /* ======================================================================== */
 /* ================================= DATA ================================= */
@@ -294,6 +302,13 @@ void m68k_run(unsigned int cycles)
     /* Trigger execution hook */
     if (UNLIKELY(cpu_hook))
       cpu_hook(HOOK_M68K_E, 0, REG_PC, 0);
+#endif
+
+#ifdef TRACE_M68K
+	/* Save current instruction PC */
+	m68k.prev_pc = REG_PC;
+
+	//trace_m68k();
 #endif
 
     /* Decode next instruction */
