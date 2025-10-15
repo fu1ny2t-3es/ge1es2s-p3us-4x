@@ -1261,6 +1261,35 @@ unsigned int vdp_68k_ctrl_r(unsigned int cycles)
 {
   unsigned int temp;
 
+#ifdef DUMP_RAM
+	if(0) {
+		FILE *fp = fopen("vram.bin","wb");
+		int lcv;
+		if(fp) {
+			for( lcv = 0; lcv < 0x10000; lcv += 2 ) {
+				fwrite(vram + lcv + 1, 1, 1, fp);
+				fwrite(vram + lcv + 0, 1, 1, fp);
+			}
+			fclose(fp);
+		}
+
+		fp = fopen("ram.bin","wb");
+		if(fp) {
+			for( lcv = 0; lcv < 0x10000; lcv += 2 ) {
+				fwrite(m68k.memory_map[0xff].base + lcv + 1, 1, 1, fp);
+				fwrite(m68k.memory_map[0xff].base + lcv + 0, 1, 1, fp);
+			}
+			fclose(fp);
+		}
+
+		fp = fopen("z80.bin","wb");
+		if(fp) {
+			fwrite(zram, 1, 0x2000, fp);
+			fclose(fp);
+		}
+	}
+#endif
+
   /* Cycle-accurate VDP status read (adjust CPU time with current instruction execution time) */
   cycles += m68k_cycles();
 
