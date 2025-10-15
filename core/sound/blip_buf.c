@@ -27,39 +27,38 @@ details. You should have received a copy of the GNU Lesser General Public
 License along with this module; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA */
 
-
 #if defined (BLARGG_TEST) && BLARGG_TEST
 	#include "blargg_test.h"
 #endif
 
-/* Equivalent to ULONG_MAX >= 0xFFFFFFFF00000000.
-Avoids constants that don't fit in 32 bits. */
-#if ULONG_MAX/0xFFFFFFFF > 0xFFFFFFFF
-	typedef unsigned long fixed_t;
-	enum { pre_shift = 32 };
+/*
+YM = 53693175
+PSG = 32552
+CDDA = 44100
+External = 48000  [Paprium, YX-5000]
+*/
 
-#elif defined(ULLONG_MAX)
-	typedef unsigned long long fixed_t;
-	enum { pre_shift = 32 };
+#define BAND_LIMITED_WIDTH (1 << 6)  /* 64 */
+#define BAND_LIMITED_PHASES (1 << 12)  /* 4096 */
+#define BAND_LIMITED_ONE (1 << 13)  /* 1.18.13 = 7x overdrive */
 
-#else
-	typedef unsigned fixed_t;
-	enum { pre_shift = 0 };
+#define M_PI 3.14159265358979323846
 
-#endif
+typedef unsigned long long fixed_t;
+enum { pre_shift = 0 };
 
-enum { time_bits = pre_shift + 20 };
+enum { time_bits = pre_shift + 40 };  /* 24.40 ~ 768000 */
 
 static fixed_t const time_unit = (fixed_t) 1 << time_bits;
 
 enum { bass_shift  = 9 }; /* affects high-pass filter breakpoint frequency */
 enum { end_frame_extra = 2 }; /* allows deltas slightly after frame length */
 
-enum { half_width  = 8 };
+enum { half_width  = 64/2 };
 enum { buf_extra   = half_width*2 + end_frame_extra };
-enum { phase_bits  = 5 };
+enum { phase_bits  = 12 };
 enum { phase_count = 1 << phase_bits };
-enum { delta_bits  = 15 };
+enum { delta_bits  = 13 };
 enum { delta_unit  = 1 << delta_bits };
 enum { frac_bits = time_bits - pre_shift };
 enum { phase_shift = frac_bits - phase_bits };
@@ -116,6 +115,83 @@ enum { min_sample = -32768 };
     else if ( n < min_sample) n = min_sample;\
 	}
 
+#if 1
+#include "blip-4096-64.h"
+
+static void __attribute__((constructor)) band_limited_init(void) {}
+
+#else
+static int band_limited_steps[BAND_LIMITED_PHASES][BAND_LIMITED_WIDTH];
+
+static void __attribute__((constructor)) band_limited_init(void)
+{
+	static int once = 0;
+
+	if( once ) return;
+	once = 1;
+
+    const unsigned master_size = BAND_LIMITED_WIDTH * BAND_LIMITED_PHASES;
+    double *master = malloc(master_size  * sizeof(*master));
+    memset(master, 0, master_size  * sizeof(*master));
+    
+    const double lowpass = 15.0 / 16.0; // 1.0 means using Nyquist as the exact cutoff
+    const double to_angle = M_PI / BAND_LIMITED_PHASES * lowpass;
+    double sum = 0;
+
+    for (signed i = 0; i < master_size; i++) {
+        // Exact Blackman window
+        const double a0 = 7938 / 18608.0;
+        const double a1 = 9240 / 18608.0;
+        const double a2 = 1430 / 18608.0;
+        double window_angle = (2.0 * M_PI * i) / (master_size);
+        double window = a0 - a1 * cos(window_angle) + a2 * cos(2 * window_angle);
+        
+        double angle = (i - (signed)master_size / 2) * to_angle;
+        sum += master[i] = ((angle == 0)? 1 : sin(angle) / angle) * window;
+    }
+    
+    for (signed i = 0; i < master_size; i++) {
+        master[i] /= sum;
+    }
+    
+    for (signed phase = 0; phase < BAND_LIMITED_PHASES; phase++) {
+        int error = BAND_LIMITED_ONE;
+        for (signed i = 0; i < BAND_LIMITED_WIDTH; i++) {
+            double sum = 0;
+            for (signed j = 0; j < BAND_LIMITED_PHASES; j++) {
+                signed index = i * BAND_LIMITED_PHASES - phase + j;
+                if (index >= 0) {
+                    sum += master[index];
+                }
+            }
+            int cur = sum * BAND_LIMITED_ONE;
+            error -= cur;
+            band_limited_steps[phase][i] = cur;
+        }
+        
+        // Make sure the deltas sum to 1.0
+        band_limited_steps[phase][BAND_LIMITED_WIDTH / 2] += error;
+    }
+    free(master);
+
+
+	if(0) {
+		FILE *fp_out = fopen("blip-.h", "w");
+
+		fprintf(fp_out, "static int band_limited_steps[%d][%d] = {\n", BAND_LIMITED_PHASES, BAND_LIMITED_WIDTH);
+		for( int lcv1 = 0; lcv1 < BAND_LIMITED_PHASES; lcv1++ ) {
+			fprintf(fp_out, "\t{ ");
+			for( int lcv2 = 0; lcv2 < BAND_LIMITED_WIDTH; lcv2++ ) {
+				fprintf(fp_out, "%d, ", band_limited_steps[lcv1][lcv2]);
+			}
+			fprintf(fp_out, "},\n");
+		}
+		fprintf(fp_out, "};\n");
+		fclose(fp_out);
+	}
+}
+#endif
+
 #ifdef BLIP_ASSERT
 static void check_assumptions( void )
 {
@@ -147,6 +223,8 @@ blip_t* blip_new( int size )
 	assert( size >= 0 );
 #endif
   
+	band_limited_init();
+
 #ifdef BLIP_MONO
 	m = (blip_t*) malloc( sizeof *m + (size + buf_extra) * sizeof (buf_t) );
 #else
@@ -195,6 +273,11 @@ void blip_set_rates( blip_t* m, double clock_rate, double sample_rate )
 	double factor = time_unit * sample_rate / clock_rate;
 	m->factor = (fixed_t) factor;
 	
+#if DEBUG
+	if(!debug) debug = fopen("debug.txt","w");
+	fprintf(debug, "rates = %llu - %f %f %f\n", m->factor, clock_rate, sample_rate, factor);
+#endif
+
 #ifdef BLIP_ASSERT
 	/* Fails if clock_rate exceeds maximum, relative to sample_rate */
 	assert( 0 <= factor - m->factor && factor - m->factor < 1 );
@@ -320,7 +403,7 @@ int blip_read_samples( blip_t* m, short out [], int count)
 			*out++ = s;
 
 			/* High-pass filter */
-			sum -= s << (delta_bits - bass_shift);
+			//sum -= s << (delta_bits - bass_shift);
 
 #ifndef BLIP_MONO
 			/* Eliminate fraction */
@@ -333,7 +416,7 @@ int blip_read_samples( blip_t* m, short out [], int count)
 			*out++ = s;
 
 			/* High-pass filter */
-			sum2 -= s << (delta_bits - bass_shift);
+			//sum2 -= s << (delta_bits - bass_shift);
 #endif
 		}
 		while ( in != end );
@@ -401,7 +484,7 @@ int blip_mix_samples( blip_t* m1, blip_t** m2, int num, short out [], int count)
       *out++ = s;
 
       /* High-pass filter */
-      sum -= s << (delta_bits - bass_shift);
+      //sum -= s << (delta_bits - bass_shift);
 
 #ifndef BLIP_MONO
       /* Eliminate fraction */
@@ -416,7 +499,7 @@ int blip_mix_samples( blip_t* m1, blip_t** m2, int num, short out [], int count)
       *out++ = s;
 
       /* High-pass filter */
-      sum2 -= s << (delta_bits - bass_shift);
+      //sum2 -= s << (delta_bits - bass_shift);
 #endif
     }
     while ( in[0] != end );
@@ -435,66 +518,16 @@ int blip_mix_samples( blip_t* m1, blip_t** m2, int num, short out [], int count)
   return count;
 }
 
-/* Things that didn't help performance on x86:
-	__attribute__((aligned(128)))
-	#define short int
-	restrict
-*/
-
-/* Sinc_Generator( 0.9, 0.55, 4.5 ) */
-static short const bl_step [phase_count + 1] [half_width] =
-{
-{   43, -115,  350, -488, 1136, -914, 5861,21022},
-{   44, -118,  348, -473, 1076, -799, 5274,21001},
-{   45, -121,  344, -454, 1011, -677, 4706,20936},
-{   46, -122,  336, -431,  942, -549, 4156,20829},
-{   47, -123,  327, -404,  868, -418, 3629,20679},
-{   47, -122,  316, -375,  792, -285, 3124,20488},
-{   47, -120,  303, -344,  714, -151, 2644,20256},
-{   46, -117,  289, -310,  634,  -17, 2188,19985},
-{   46, -114,  273, -275,  553,  117, 1758,19675},
-{   44, -108,  255, -237,  471,  247, 1356,19327},
-{   43, -103,  237, -199,  390,  373,  981,18944},
-{   42,  -98,  218, -160,  310,  495,  633,18527},
-{   40,  -91,  198, -121,  231,  611,  314,18078},
-{   38,  -84,  178,  -81,  153,  722,   22,17599},
-{   36,  -76,  157,  -43,   80,  824, -241,17092},
-{   34,  -68,  135,   -3,    8,  919, -476,16558},
-{   32,  -61,  115,   34,  -60, 1006, -683,16001},
-{   29,  -52,   94,   70, -123, 1083, -862,15422},
-{   27,  -44,   73,  106, -184, 1152,-1015,14824},
-{   25,  -36,   53,  139, -239, 1211,-1142,14210},
-{   22,  -27,   34,  170, -290, 1261,-1244,13582},
-{   20,  -20,   16,  199, -335, 1301,-1322,12942},
-{   18,  -12,   -3,  226, -375, 1331,-1376,12293},
-{   15,   -4,  -19,  250, -410, 1351,-1408,11638},
-{   13,    3,  -35,  272, -439, 1361,-1419,10979},
-{   11,    9,  -49,  292, -464, 1362,-1410,10319},
-{    9,   16,  -63,  309, -483, 1354,-1383, 9660},
-{    7,   22,  -75,  322, -496, 1337,-1339, 9005},
-{    6,   26,  -85,  333, -504, 1312,-1280, 8355},
-{    4,   31,  -94,  341, -507, 1278,-1205, 7713},
-{    3,   35, -102,  347, -506, 1238,-1119, 7082},
-{    1,   40, -110,  350, -499, 1190,-1021, 6464},
-{    0,   43, -115,  350, -488, 1136, -914, 5861}
-};
-
-/* Shifting by pre_shift allows calculation using unsigned int rather than
-possibly-wider fixed_t. On 32-bit platforms, this is likely more efficient.
-And by having pre_shift 32, a 32-bit platform can easily do the shift by
-simply ignoring the low half. */
-
 #ifndef BLIP_MONO
 
 void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
 {
   if (delta_l | delta_r)
   {
-    unsigned fixed = (unsigned) ((time * m->factor + m->offset) >> pre_shift);
-    int phase = fixed >> phase_shift & (phase_count - 1);
-    short const* in  = bl_step [phase];
-    short const* rev = bl_step [phase_count - phase];
-    int interp = fixed >> (phase_shift - delta_bits) & (delta_unit - 1);
+    fixed_t fixed = (fixed_t) ((time * m->factor + m->offset) >> pre_shift);
+    int phase = (fixed >> phase_shift) & (phase_count - 1);
+    int const* in = band_limited_steps [phase];
+    int interp = (fixed >> (phase_shift - delta_bits)) & (delta_unit - 1);
     int pos = fixed >> frac_bits;
 
 #ifdef BLIP_INVERT
@@ -505,107 +538,15 @@ void blip_add_delta( blip_t* m, unsigned time, int delta_l, int delta_r )
     buf_t* out_r = m->buffer[1] + pos;
 #endif
 
-    int delta;
-
 #ifdef BLIP_ASSERT
     /* Fails if buffer size was exceeded */
     assert( pos <= m->size + end_frame_extra );
 #endif
 
-    if (delta_l == delta_r)
-    {
-      buf_t out;
-      delta = (delta_l * interp) >> delta_bits;
-      delta_l -= delta;
-      out = in[0]*delta_l + in[half_width+0]*delta;
-      out_l[0] += out;
-      out_r[0] += out;
-      out = in[1]*delta_l + in[half_width+1]*delta;
-      out_l[1] += out;
-      out_r[1] += out;
-      out = in[2]*delta_l + in[half_width+2]*delta;
-      out_l[2] += out;
-      out_r[2] += out;
-      out = in[3]*delta_l + in[half_width+3]*delta;
-      out_l[3] += out;
-      out_r[3] += out;
-      out = in[4]*delta_l + in[half_width+4]*delta;
-      out_l[4] += out;
-      out_r[4] += out;
-      out = in[5]*delta_l + in[half_width+5]*delta;
-      out_l[5] += out;
-      out_r[5] += out;
-      out = in[6]*delta_l + in[half_width+6]*delta;
-      out_l[6] += out;
-      out_r[6] += out;
-      out = in[7]*delta_l + in[half_width+7]*delta;
-      out_l[7] += out;
-      out_r[7] += out;
-      out = rev[7]*delta_l + rev[7-half_width]*delta;
-      out_l[8] += out;
-      out_r[8] += out;
-      out = rev[6]*delta_l + rev[6-half_width]*delta;
-      out_l[9] += out;
-      out_r[9] += out;
-      out = rev[5]*delta_l + rev[5-half_width]*delta;
-      out_l[10] += out;
-      out_r[10] += out;
-      out = rev[4]*delta_l + rev[4-half_width]*delta;
-      out_l[11] += out;
-      out_r[11] += out;
-      out = rev[3]*delta_l + rev[3-half_width]*delta;
-      out_l[12] += out;
-      out_r[12] += out;
-      out = rev[2]*delta_l + rev[2-half_width]*delta;
-      out_l[13] += out;
-      out_r[13] += out;
-      out = rev[1]*delta_l + rev[1-half_width]*delta;
-      out_l[14] += out;
-      out_r[14] += out;
-      out = rev[0]*delta_l + rev[0-half_width]*delta;
-      out_l[15] += out;
-      out_r[15] += out;
-    }
-    else
-    {
-      delta = (delta_l * interp) >> delta_bits;
-      delta_l -= delta;
-      out_l [0] += in[0]*delta_l + in[half_width+0]*delta;
-      out_l [1] += in[1]*delta_l + in[half_width+1]*delta;
-      out_l [2] += in[2]*delta_l + in[half_width+2]*delta;
-      out_l [3] += in[3]*delta_l + in[half_width+3]*delta;
-      out_l [4] += in[4]*delta_l + in[half_width+4]*delta;
-      out_l [5] += in[5]*delta_l + in[half_width+5]*delta;
-      out_l [6] += in[6]*delta_l + in[half_width+6]*delta;
-      out_l [7] += in[7]*delta_l + in[half_width+7]*delta;
-      out_l [8] += rev[7]*delta_l + rev[7-half_width]*delta;
-      out_l [9] += rev[6]*delta_l + rev[6-half_width]*delta;
-      out_l [10] += rev[5]*delta_l + rev[5-half_width]*delta;
-      out_l [11] += rev[4]*delta_l + rev[4-half_width]*delta;
-      out_l [12] += rev[3]*delta_l + rev[3-half_width]*delta;
-      out_l [13] += rev[2]*delta_l + rev[2-half_width]*delta;
-      out_l [14] += rev[1]*delta_l + rev[1-half_width]*delta;
-      out_l [15] += rev[0]*delta_l + rev[0-half_width]*delta;
-
-      delta = (delta_r * interp) >> delta_bits;
-      delta_r -= delta;
-      out_r [0] += in[0]*delta_r + in[half_width+0]*delta;
-      out_r [1] += in[1]*delta_r + in[half_width+1]*delta;
-      out_r [2] += in[2]*delta_r + in[half_width+2]*delta;
-      out_r [3] += in[3]*delta_r + in[half_width+3]*delta;
-      out_r [4] += in[4]*delta_r + in[half_width+4]*delta;
-      out_r [5] += in[5]*delta_r + in[half_width+5]*delta;
-      out_r [6] += in[6]*delta_r + in[half_width+6]*delta;
-      out_r [7] += in[7]*delta_r + in[half_width+7]*delta;
-      out_r [8] += rev[7]*delta_r + rev[7-half_width]*delta;
-      out_r [9] += rev[6]*delta_r + rev[6-half_width]*delta;
-      out_r [10] += rev[5]*delta_r + rev[5-half_width]*delta;
-      out_r [11] += rev[4]*delta_r + rev[4-half_width]*delta;
-      out_r [12] += rev[3]*delta_r + rev[3-half_width]*delta;
-      out_r [13] += rev[2]*delta_r + rev[2-half_width]*delta;
-      out_r [14] += rev[1]*delta_r + rev[1-half_width]*delta;
-      out_r [15] += rev[0]*delta_r + rev[0-half_width]*delta;
-    }
+	for( int lcv = 0; lcv < BAND_LIMITED_WIDTH; lcv++ ) {
+		out_l [lcv] += in[lcv]*delta_l;
+		out_r [lcv] += in[lcv]*delta_r;
+	}
   }
 }
 
@@ -613,8 +554,8 @@ void blip_add_delta_fast( blip_t* m, unsigned time, int delta_l, int delta_r )
 {
   if (delta_l | delta_r)
   {
-    unsigned fixed = (unsigned) ((time * m->factor + m->offset) >> pre_shift);
-    int interp = fixed >> (frac_bits - delta_bits) & (delta_unit - 1);
+    fixed_t fixed = (fixed_t) ((time * m->factor + m->offset) >> pre_shift);
+    int interp = (fixed >> (frac_bits - delta_bits)) & (delta_unit - 1);
     int pos = fixed >> frac_bits;
 
 #ifdef STEREO_INVERT
@@ -655,45 +596,28 @@ void blip_add_delta_fast( blip_t* m, unsigned time, int delta_l, int delta_r )
 
 void blip_add_delta( blip_t* m, unsigned time, int delta )
 {
-	unsigned fixed = (unsigned) ((time * m->factor + m->offset) >> pre_shift);
+	fixed_t fixed = (fixed_t) ((time * m->factor + m->offset) >> pre_shift);
 	buf_t* out = SAMPLES( m ) + (fixed >> frac_bits);
 	
-	int phase = fixed >> phase_shift & (phase_count - 1);
-	short const* in  = bl_step [phase];
-	short const* rev = bl_step [phase_count - phase];
+	int phase = (fixed >> phase_shift) & (phase_count - 1);
+	int const* in  = bl_step [phase];
+	int const* rev = bl_step [phase_count - phase];
 	
-	int interp = fixed >> (phase_shift - delta_bits) & (delta_unit - 1);
-	int delta2 = (delta * interp) >> delta_bits;
-	delta -= delta2;
-	
+	int interp = (fixed >> (phase_shift - delta_bits)) & (delta_unit - 1);
+
 #ifdef BLIP_ASSERT
 	/* Fails if buffer size was exceeded */
 	assert( out <= &SAMPLES( m ) [m->size + end_frame_extra] );
 #endif
 
-	out [0] += in[0]*delta + in[half_width+0]*delta2;
-	out [1] += in[1]*delta + in[half_width+1]*delta2;
-	out [2] += in[2]*delta + in[half_width+2]*delta2;
-	out [3] += in[3]*delta + in[half_width+3]*delta2;
-	out [4] += in[4]*delta + in[half_width+4]*delta2;
-	out [5] += in[5]*delta + in[half_width+5]*delta2;
-	out [6] += in[6]*delta + in[half_width+6]*delta2;
-	out [7] += in[7]*delta + in[half_width+7]*delta2;
-	
-	in = rev;
-	out [ 8] += in[7]*delta + in[7-half_width]*delta2;
-	out [ 9] += in[6]*delta + in[6-half_width]*delta2;
-	out [10] += in[5]*delta + in[5-half_width]*delta2;
-	out [11] += in[4]*delta + in[4-half_width]*delta2;
-	out [12] += in[3]*delta + in[3-half_width]*delta2;
-	out [13] += in[2]*delta + in[2-half_width]*delta2;
-	out [14] += in[1]*delta + in[1-half_width]*delta2;
-	out [15] += in[0]*delta + in[0-half_width]*delta2;
+	for( int lcv = 0; lcv < BAND_LIMITED_WIDTH; lcv++ ) {
+		out [lcv] += in[lcv]*delta;
+	}
 }
 
 void blip_add_delta_fast( blip_t* m, unsigned time, int delta )
 {
-	unsigned fixed = (unsigned) ((time * m->factor + m->offset) >> pre_shift);
+	fixed_t fixed = (fixed_t) ((time * m->factor + m->offset) >> pre_shift);
 	buf_t* out = SAMPLES( m ) + (fixed >> frac_bits);
 	
 	int interp = fixed >> (frac_bits - delta_bits) & (delta_unit - 1);
