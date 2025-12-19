@@ -10,5 +10,4 @@ Video:
 
 
 Compiler:
-- Ternary brackets  [MinGW fixing]
 - Faster compiler  [O3]
