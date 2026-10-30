@@ -56788,7 +56788,7 @@ struct retro_core_options_v2 options_sr = {
 #define CATEGORY_CHANNEL_VOLUME_INFO_0_SV "Ändra volymen för enskilda ljudkanaler i hårdvaran."
 #define GENESIS_PLUS_GX_SYSTEM_HW_LABEL_SV "Systemhårdvara"
 #define GENESIS_PLUS_GX_SYSTEM_HW_INFO_0_SV "Kör inläst innehåll med en specifik emulerad konsol. ”Auto” väljer det system som är mest lämpligt för det aktuella spelet."
-#define OPTION_VAL_AUTO_SV NULL
+#define OPTION_VAL_AUTO_SV "Automatiskt"
 #define OPTION_VAL_SG_1000_SV NULL
 #define OPTION_VAL_SG_1000_II_SV NULL
 #define OPTION_VAL_SG_1000_II_RAM_EXT_SV NULL
@@ -56843,7 +56843,7 @@ struct retro_core_options_v2 options_sr = {
 #define GENESIS_PLUS_GX_OVERSCAN_INFO_0_SV "Aktivera detta för att visa överskanningsområdena längst upp/ned och/eller till vänster/höger på skärmen. Dessa skulle normalt vara dolda av ramen runt kanten på en standard-Tv."
 #define OPTION_VAL_TOP_BOTTOM_SV "Topp/Botten"
 #define OPTION_VAL_LEFT_RIGHT_SV "Vänster/Höger"
-#define OPTION_VAL_FULL_SV NULL
+#define OPTION_VAL_FULL_SV "Fullständig"
 #define GENESIS_PLUS_GX_LEFT_BORDER_LABEL_SV "Dölj sidokanter för Master System"
 #define GENESIS_PLUS_GX_LEFT_BORDER_INFO_0_SV "Skär bort 8 bildpunkter från antingen vänster sida av skärmen eller från både vänster och höger sida när Master System-spel körs."
 #define OPTION_VAL_LEFT_BORDER_SV "Endast vänster ram"
@@ -56859,7 +56859,7 @@ struct retro_core_options_v2 options_sr = {
 #define GENESIS_PLUS_GX_LCD_FILTER_LABEL_SV "Filter för LCD-efterbilder"
 #define GENESIS_PLUS_GX_LCD_FILTER_INFO_0_SV "Använd ett ”efterbilds”-filter för att efterlikna LCD-skärmarna på Game Gear och Genesis Nomad."
 #define GENESIS_PLUS_GX_RENDER_LABEL_SV "Utmatning med interlaced läge 2"
-#define GENESIS_PLUS_GX_RENDER_INFO_0_SV "Interlaced Mode 2 gör att Mega Drive/Genesis kan ge en 320x448-bild med dubbel höjd (hög upplösning) genom att rita alternativa scanlinjer varje bildruta (detta används av Sonic the Hedgehog 2 och Combat Cars flerspelarlägen). ”Double Field” efterliknar originalhårdvaran och ger en skarp bild med flimmer/interlacing-artefakter. ”Single Field” använder ett deinterlacing-filter som stabiliserar bilden men orsakar lätt oskärpa."
+#define GENESIS_PLUS_GX_RENDER_INFO_0_SV "Interlaced Mode 2 gör att Mega Drive/Genesis kan ge en bild med 320x448 punkter och dubbel höjd genom att rita varannan bildrad i varje bildruta. Det används i flerspelarlägena i Sonic the Hedgehog 2 och Combat Cars. ”Double Field” efterliknar originalhårdvaran och ger en skarp bild med flimmer och sammanflätningsartefakter. ”Single Field” använder ett avsammanflätningsfilter som stabiliserar bilden men orsakar lätt oskärpa."
 #define OPTION_VAL_SINGLE_FIELD_SV "Enkelt fält"
 #define OPTION_VAL_DOUBLE_FIELD_SV "Dubbelt fält"
 #define GENESIS_PLUS_GX_FRAMESKIP_LABEL_SV "Bildrutsöverhoppning"
@@ -56870,12 +56870,12 @@ struct retro_core_options_v2 options_sr = {
 #define GENESIS_PLUS_GX_YM2413_LABEL_SV NULL
 #define GENESIS_PLUS_GX_YM2413_INFO_0_SV "Aktivera emulering av FM-ljudkortet som används av vissa Sega Mark III/Master System-spel för förbättrad ljudutgång."
 #define GENESIS_PLUS_GX_YM2413_CORE_LABEL_SV "Kärna för Master System FM (YM2413)"
-#define GENESIS_PLUS_GX_YM2413_CORE_INFO_0_SV "Välj metod som används för att emulera FM-ljudenheten i Sega Mark III/Master System. ”MAME\"-alternativet är snabbt och körs i full hastighet på de flesta system. Alternativet ”Nuked” är cykelnoggrannt, av mycket hög kvalitet och har betydande CPU-krav."
+#define GENESIS_PLUS_GX_YM2413_CORE_INFO_0_SV "Välj metod för att emulera FM-ljudenheten i Sega Mark III/Master System. Alternativet ”MAME” är snabbt och körs i full hastighet på de flesta system. Alternativet ”Nuked” är cykelnoggrant, av mycket hög kvalitet och har betydande CPU-krav."
 #define OPTION_VAL_MAME_SV NULL
 #define OPTION_VAL_NUKED_SV NULL
 #define GENESIS_PLUS_GX_YM2612_LABEL_SV NULL
-#define GENESIS_PLUS_GX_YM2612_INFO_0_SV "Välj metod som används för att emulera FM-syntesen (huvudljudgeneratorn) i Mega Drive/Genesis. ”MAME\"-alternativen är snabba och körs i full hastighet på de flesta system. 'Nuked'-alternativen är cykelnoggranna, av mycket hög kvalitet och har betydande CPU-krav. YM2612-chipet används av den ursprungliga Model 1 Mega Drive/Genesis. YM3438 används i senare versioner av Mega Drive/Genesis."
-#define GENESIS_PLUS_GX_YM2612_INFO_1_SV "Välj metod som används för att emulera FM-syntesen (huvudljudgeneratorn) i Mega Drive/Genesis. YM2612-chipet används av den ursprungliga Model 1 Mega Drive/Genesis. YM3438 används i senare versioner av Mega Drive/Genesis."
+#define GENESIS_PLUS_GX_YM2612_INFO_0_SV "Välj metod för att emulera FM-syntesen, huvudljudgeneratorn, i Mega Drive/Genesis. Alternativen ”MAME” är snabba och körs med full hastighet på de flesta system. Alternativen ”Nuked” är cykelnoggranna, av mycket hög kvalitet och har betydande CPU-krav. YM2612-chipet används i den ursprungliga Model 1 Mega Drive/Genesis."
+#define GENESIS_PLUS_GX_YM2612_INFO_1_SV "Välj metod för att emulera FM-syntesen (huvudljudgeneratorn) i Mega Drive/Genesis. YM2612-chipet används i den ursprungliga Model 1 Mega Drive/Genesis. YM3438 används i senare versioner av Mega Drive/Genesis."
 #define OPTION_VAL_MAME_YM2612_SV NULL
 #define OPTION_VAL_MAME_ASIC_YM3438_SV NULL
 #define OPTION_VAL_MAME_ENHANCED_YM3438_SV NULL
@@ -56886,7 +56886,7 @@ struct retro_core_options_v2 options_sr = {
 #define OPTION_VAL_STEREO_SV NULL
 #define OPTION_VAL_MONO_SV NULL
 #define GENESIS_PLUS_GX_AUDIO_FILTER_LABEL_SV "Ljudfilter"
-#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_SV "Aktivera ett lågpassljudfilter för att bättre simulera det karakteristiska ljudet från en Model 1 Mega Drive/Genesis."
+#define GENESIS_PLUS_GX_AUDIO_FILTER_INFO_0_SV "Aktivera ett ljudlågpassfilter för att bättre simulera det karakteristiska ljudet från en Model 1 Mega Drive/Genesis."
 #define OPTION_VAL_LOW_PASS_SV "Lågpass"
 #define OPTION_VAL_EQ_SV NULL
 #define GENESIS_PLUS_GX_LOWPASS_RANGE_LABEL_SV "Lågpassfilter %"
@@ -56920,30 +56920,30 @@ struct retro_core_options_v2 options_sr = {
 #define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_LABEL_SV "Förbättrad vertikal rullningsgräns per ruta"
 #define GENESIS_PLUS_GX_ENHANCED_VSCROLL_LIMIT_INFO_0_SV "Endast när Förbättrad vertikal rullning per ruta är aktiverat. Justerar gränsen för förbättrad vertikal rullning. När skillnaden i vertikal rullning mellan angränsande rutor är större än denna gräns inaktiveras förbättringen."
 #define GENESIS_PLUS_GX_OVERCLOCK_LABEL_SV "CPU-hastighet"
-#define GENESIS_PLUS_GX_OVERCLOCK_INFO_0_SV "Överklocka den emulerade processorn. Kan minska långsamheter, men kan orsaka glitchar."
-#define OPTION_VAL_100_SV NULL
-#define OPTION_VAL_125_SV NULL
-#define OPTION_VAL_150_SV NULL
-#define OPTION_VAL_175_SV NULL
-#define OPTION_VAL_200_SV NULL
-#define OPTION_VAL_225_SV NULL
-#define OPTION_VAL_250_SV NULL
-#define OPTION_VAL_275_SV NULL
-#define OPTION_VAL_300_SV NULL
-#define OPTION_VAL_325_SV NULL
-#define OPTION_VAL_350_SV NULL
-#define OPTION_VAL_375_SV NULL
-#define OPTION_VAL_400_SV NULL
-#define OPTION_VAL_425_SV NULL
-#define OPTION_VAL_450_SV NULL
-#define OPTION_VAL_475_SV NULL
-#define OPTION_VAL_500_SV NULL
+#define GENESIS_PLUS_GX_OVERCLOCK_INFO_0_SV "Överklocka den emulerade processorn. Kan minska långsamhet, men kan orsaka fel."
+#define OPTION_VAL_100_SV "100 %"
+#define OPTION_VAL_125_SV "125 %"
+#define OPTION_VAL_150_SV "150 %"
+#define OPTION_VAL_175_SV "175 %"
+#define OPTION_VAL_200_SV "200 %"
+#define OPTION_VAL_225_SV "225 %"
+#define OPTION_VAL_250_SV "250 %"
+#define OPTION_VAL_275_SV "275 %"
+#define OPTION_VAL_300_SV "300 %"
+#define OPTION_VAL_325_SV "325 %"
+#define OPTION_VAL_350_SV "350 %"
+#define OPTION_VAL_375_SV "375 %"
+#define OPTION_VAL_400_SV "400 %"
+#define OPTION_VAL_425_SV "425 %"
+#define OPTION_VAL_450_SV "450 %"
+#define OPTION_VAL_475_SV "475 %"
+#define OPTION_VAL_500_SV "500 %"
 #define GENESIS_PLUS_GX_FORCE_DTACK_LABEL_SV "Systemlåsningar"
 #define GENESIS_PLUS_GX_FORCE_DTACK_INFO_0_SV "Emulera systemlåsningar som inträffar på riktig hårdvara när man utför olaglig adressåtkomst. Detta bör endast inaktiveras när du spelar vissa demos och homebrew som förlitar sig på otillåtet beteende för korrekt funktion."
 #define GENESIS_PLUS_GX_ADDR_ERROR_LABEL_SV "68K-adressfel"
-#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_SV "Mega Drive/Genesis huvudprocessor (Motorola 68000) genererar ett Address Error-undantag (krasch) när den försöker utföra ojusterad minnesåtkomst. Om du aktiverar detta kommer du att simulera detta beteende. Det bör endast inaktiveras när du spelar ROM-hack, eftersom dessa vanligtvis utvecklas med mindre exakta emulatorer och kan förlita sig på ogiltig RAM-åtkomst för korrekt funktion."
+#define GENESIS_PLUS_GX_ADDR_ERROR_INFO_0_SV "Huvudprocessorn i Mega Drive/Genesis (Motorola 68000) genererar ett Address Error-undantag (krasch) när den försöker utföra ojusterad minnesåtkomst. När funktionen aktiveras simuleras detta beteende. Den bör bara inaktiveras när modifierade ROM-avbilder spelas eftersom dessa ofta utvecklas med mindre exakta emulatorer och kan förlita sig på ogiltig RAM-åtkomst för att fungera korrekt."
 #define GENESIS_PLUS_GX_CD_LATENCY_LABEL_SV "CD-åtkomsttid"
-#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_SV "Simulera den ursprungliga CD-maskinvarans latens när du initierar en läsning eller sökning till en specifik plats på den inlästa skivan. Detta krävs av några CD-spel som kraschar om CD-data är tillgängliga för tidigt och åtgärdar även problem med desynkronisering av CD-ljud i vissa spel. Att inaktivera detta kan vara användbart med MSU-MD-spel eftersom det gör CD-ljudspårsloopar mer sömlösa."
+#define GENESIS_PLUS_GX_CD_LATENCY_INFO_0_SV "Simulera den ursprungliga CD-maskinvarans fördröjning när en läsning startas eller en specifik plats på den inlästa skivan söks. Detta krävs av några CD-spel som kraschar om CD-data blir tillgängliga för tidigt och åtgärdar även problem med desynkroniserat CD-ljud i vissa spel. Att inaktivera detta kan vara användbart med MSU-MD-spel eftersom det gör övergångarna mellan CD-ljudspår mjukare."
 #define GENESIS_PLUS_GX_CD_PRECACHE_LABEL_SV "CD-avbildningscache"
 #define GENESIS_PLUS_GX_CD_PRECACHE_INFO_0_SV "Läs in cd-avbildning till minnet vid uppstart. CHD stöds endast. Kräver omstart."
 #define GENESIS_PLUS_GX_SHOW_ADVANCED_AUDIO_SETTINGS_LABEL_SV "Visa avancerade inställningar för ljudvolym (Öppnar menyn igen)"
@@ -56954,8 +56954,8 @@ struct retro_core_options_v2 options_sr = {
 #define GENESIS_PLUS_GX_PSG_CHANNEL_1_VOLUME_INFO_0_SV "Sänk volymen för PSG:s tonkanal 1."
 #define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_LABEL_SV "Volym för PSG:s tonkanal 2 i %"
 #define GENESIS_PLUS_GX_PSG_CHANNEL_2_VOLUME_INFO_0_SV "Sänk volymen för PSG:s tonkanal 2."
-#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_LABEL_SV "Volym för PSG Noise-kanal 3 i %"
-#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_INFO_0_SV "Sänk volymen för PSG Noise-kanal 3."
+#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_LABEL_SV "Volym för PSG-bruskanal 3 i %"
+#define GENESIS_PLUS_GX_PSG_CHANNEL_3_VOLUME_INFO_0_SV "Sänk volymen för PSG-bruskanal 3."
 #define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_LABEL_SV "Volym för Mega Drive/Genesis FM-kanal 0 i %"
 #define GENESIS_PLUS_GX_MD_CHANNEL_0_VOLUME_INFO_0_SV "Sänk volymen på Mega Drive/Genesis FM-kanal 0. Fungerar endast med MAME FM-emulatorer."
 #define GENESIS_PLUS_GX_MD_CHANNEL_1_VOLUME_LABEL_SV "Volym för Mega Drive/Genesis FM-kanal 1 i %"
